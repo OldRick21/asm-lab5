@@ -1,15 +1,24 @@
-# Добавляем -no-pie в LDFLAGS
-LDFLAGS = -no-pie -z noexecstack
-
-# Остальная часть Makefile остается без изменений
 CC = gcc
 AS = nasm
-CFLAGS = -O3 -Wall -Wextra
+CFLAGS = -Wall -Wextra -g
 ASFLAGS = -f elf64
+LDFLAGS = -no-pie -z noexecstack -lrt
 SRCS_C = main.c
 SRCS_ASM = src.s
-OBJS = $(SRCS_C:.c=.o) $(SRCS_ASM:.s=.o)
 EXE = bin
+
+TARGET ?= asm  
+OPT ?= O2      
+
+CFLAGS += -$(OPT)
+
+
+ifeq ($(TARGET),c)
+    OBJS = $(SRCS_C:.c=.o)
+    CFLAGS += -DUSE_C_VERSION
+else
+    OBJS = $(SRCS_C:.c=.o) $(SRCS_ASM:.s=.o)
+endif
 
 all: $(EXE)
 
